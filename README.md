@@ -86,7 +86,7 @@ public class XXServiceImpl implements XXService {
     private DbCacheService<Mineral, Long> mineralRepository;
 ```
 
-### 5. 接口案例
+### 5. 接口使用案例
 
 ##### a.根据ID查询
 ```
