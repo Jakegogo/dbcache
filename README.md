@@ -52,6 +52,9 @@
 <context:annotation-config/>
 <context:component-scan base-package="com.concur.dbcache" />
 	
+//配置数据源
+<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+...... 
 ```
 
 ### 3. 定义实体
