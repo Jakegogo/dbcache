@@ -1,5 +1,3 @@
-# dbcache
-CQRS数据库缓存框架
 
 # 欢迎使用DbCache
 
