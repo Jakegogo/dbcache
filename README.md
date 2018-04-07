@@ -78,7 +78,7 @@ public class Mineral implements EntityInitializer, IEntity<Long> {
 public class XXServiceImpl implements XXService {
 
     // 1.声明Entity的仓储服务(DBCache将为之自动注入)
-    // 2.指定Entity类型, 在这里Mineral是我们的尸体, Long为主键类型
+    // 2.指定Entity类型, 在这里Mineral是我们的实体, Long为主键类型
     @Autowired
     private DbCacheService<Mineral, Long> mineralRepository;
 ```
