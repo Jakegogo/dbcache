@@ -1,13 +1,12 @@
-
 # 欢迎使用DbCache
 
 ## DBCache 的设计哲学
 
 >DBCache沿袭CQRS设计思想, 将高频数据缓存到内存, 实现快速读写, 并提供简易的存取接口. 异步入库同时能够做到更加低延迟的性能. 
 >
->轻量级ORM让你在写优雅代码的同时, 兼具高性能的接口服务性能.
+>轻量级ORM让你在写优雅代码的同时, 兼具高性能的接口服务.
 >
->对了,还有你最关心的索引, 依然是DBCache透明地内存索引维护亮点!
+>对了,还有你最关心的索引, 依然是DBCache透明的内存索引维护的最大亮点!
 >
 
 ## 开始使用
@@ -58,7 +57,7 @@ public class XXServiceImpl implements XXService {
     private DbCacheService<Mineral, Long> mineralRepository;
 ```
 
-### 5. 查询案例
+### 5. 接口案例
 
 ##### a.根据ID查询
 ```
