@@ -29,8 +29,8 @@
 
 ## 顺序入库+去重 – DbPersistService
 -实现方式:
-*     队列：采用concurrentLinkedQueue的设计模式。将队列的队头和队尾热点分离，使用CAS入队和出队
-*     去重：每个Entity都有一个无固定长度的队列。 比如定义为SafeType，有一个next指针，当next指针不为空，则继续获取next，直到为null就执行入库操作
+* 队列：采用concurrentLinkedQueue的设计模式。将队列的队头和队尾热点分离，使用CAS入队和出队
+* 去重：每个Entity都有一个无固定长度的队列。 比如定义为SafeType，有一个next指针，当next指针不为空，则继续获取next，直到为null就执行入库操作
 ![图片 2](https://raw.githubusercontent.com/Jakegogo/dbcache/master/screenshots/pic1.png)
 
 
