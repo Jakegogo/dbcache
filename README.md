@@ -106,5 +106,7 @@ mineral = mineralRepository.submitCreate(mineral);
 ```
 
 
+-------
+
 > DbCache框架目前正处于Bata试用阶段,期待广大热爱技术和热爱致力于锻造优良品质框架的同胞们积极参与共建! 
 >
