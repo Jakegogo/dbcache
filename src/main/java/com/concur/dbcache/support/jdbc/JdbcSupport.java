@@ -36,11 +36,6 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 @Component
 public class JdbcSupport {
 
-	/**
-	 * logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(JdbcSupport.class);
-
 	@Autowired
     private Config config;
 

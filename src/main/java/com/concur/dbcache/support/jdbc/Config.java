@@ -1,6 +1,9 @@
 package com.concur.dbcache.support.jdbc;
 
+import com.concur.unity.logger.jdbc.ConnectionLogger;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +16,11 @@ import java.sql.Statement;
 @Component
 public class Config {
 
+	/**
+	 * logger
+	 */
+	private static final Logger logger = LoggerFactory.getLogger(JdbcSupport.class);
+
 	Dialect dialect = Dialect.getDefaultDialect();
 
 	private String name;
@@ -21,7 +29,7 @@ public class Config {
 	DataSource dataSource;
 
 	private int transactionLevel = Connection.TRANSACTION_READ_COMMITTED;
-	private boolean showSql = true;
+	private static boolean showSql = true;
 	private boolean devMode = false;
 
 	private final ThreadLocal<Connection> threadLocal = new ThreadLocal<Connection>();
@@ -33,10 +41,12 @@ public class Config {
 	 * @param dataSource the dataSource, can not be null
 	 */
 	public Config(String name, DataSource dataSource) {
-		if (StringUtils.isBlank(name))
+		if (StringUtils.isBlank(name)) {
 			throw new IllegalArgumentException("Config name can not be blank");
-		if (dataSource == null)
+		}
+		if (dataSource == null) {
 			throw new IllegalArgumentException("DataSource can not be null");
+		}
 
 		this.name = name.trim();
 		this.dataSource = dataSource;
@@ -48,12 +58,15 @@ public class Config {
 	 * @param dialect the dialect, can not be null
 	 */
 	public Config(String name, DataSource dataSource, Dialect dialect) {
-		if (StringUtils.isBlank(name))
+		if (StringUtils.isBlank(name)) {
 			throw new IllegalArgumentException("Config name can not be blank");
-		if (dataSource == null)
+		}
+		if (dataSource == null) {
 			throw new IllegalArgumentException("DataSource can not be null");
-		if (dialect == null)
+		}
+		if (dialect == null) {
 			throw new IllegalArgumentException("Dialect can not be null");
+		}
 
 		this.name = name.trim();
 		this.dataSource = dataSource;
@@ -67,8 +80,6 @@ public class Config {
 	 * @param showSql the showSql,set null with default value: false
 	 * @param devMode the devMode, set null with default value: false
 	 * @param transactionLevel the transaction level, set null with default value: Connection.TRANSACTION_READ_COMMITTED
-	 * @param containerFactory the containerFactory, set null with default value: new IContainerFactory(){......}
-	 * @param cache the cache, set null with default value: new EhCache()
 	 */
 	public Config(String name,
 				  DataSource dataSource,
@@ -76,22 +87,28 @@ public class Config {
 				  Boolean showSql,
 				  Boolean devMode,
 				  Integer transactionLevel) {
-		if (StringUtils.isBlank(name))
+		if (StringUtils.isBlank(name)) {
 			throw new IllegalArgumentException("Config name can not be blank");
-		if (dataSource == null)
+		}
+		if (dataSource == null) {
 			throw new IllegalArgumentException("DataSource can not be null");
+		}
 
 		this.name = name.trim();
 		this.dataSource = dataSource;
 
-		if (dialect != null)
+		if (dialect != null) {
 			this.dialect = dialect;
-		if (showSql != null)
+		}
+		if (showSql != null) {
 			this.showSql = showSql;
-		if (devMode != null)
+		}
+		if (devMode != null) {
 			this.devMode = devMode;
-		if (transactionLevel != null)
+		}
+		if (transactionLevel != null) {
 			this.transactionLevel = transactionLevel;
+		}
 	}
 
 	public String getName() {
@@ -136,11 +153,11 @@ public class Config {
 	 */
 	public final Connection getConnection() throws SQLException {
 		Connection conn = threadLocal.get();
-		if (conn != null) {
+		if (conn == null) {
+			conn = dataSource.getConnection();
 			threadLocal.set(conn);
-			return conn;
 		}
-		return showSql ? new SqlReporter(dataSource.getConnection()).getConnection() : dataSource.getConnection();
+		return showSql || logger.isDebugEnabled() ? ConnectionLogger.newInstance(conn, logger, 0) : conn;
 	}
 
 	/**
@@ -178,7 +195,7 @@ public class Config {
 		boolean isConnection = false;
 		
 		try {
-			if (conn.isValid(2)) {
+			if (conn != null && conn.isValid(2)) {
 				isConnection = true;
 			}
 		} catch (SQLException e) {
@@ -191,8 +208,22 @@ public class Config {
 	}
 
 	public final void close(Connection conn) {
-		if (threadLocal.get() == null)		// in transaction if conn in threadlocal
-			if (conn != null)
-				try {conn.close();} catch (SQLException e) {throw new IllegalStateException(e);}
+		if (threadLocal.get() == null) {        // in transaction if conn in threadlocal
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					throw new IllegalStateException(e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 是否显示Sql
+	 * @param showSql
+	 */
+	public static void showSql(boolean showSql) {
+		Config.showSql = showSql;
 	}
 }
