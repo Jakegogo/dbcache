@@ -3,8 +3,8 @@ package com.concur.dbcache.support.asm;
 import com.concur.dbcache.EnhancedEntity;
 import com.concur.dbcache.WeakRefHolder;
 import com.concur.dbcache.IEntity;
-import com.concur.unity.enhance.asm.util.AsmUtils;
-import com.concur.unity.enhance.asm.util.TypeUtils;
+import com.concur.unity.asm.util.AsmUtils;
+import com.concur.unity.asm.util.TypeUtils;
 import org.objectweb.asm.*;
 
 import java.lang.reflect.Method;

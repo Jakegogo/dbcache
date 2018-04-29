@@ -2,8 +2,8 @@ package com.concur.dbcache.support.asm;
 
 import com.concur.dbcache.EnhanceAccessError;
 import com.concur.dbcache.anno.ThreadSafe;
-import com.concur.unity.enhance.asm.AsmClassLoader;
-import com.concur.unity.enhance.asm.util.AsmUtils;
+import com.concur.unity.asm.AsmClassLoader;
+import com.concur.unity.asm.util.AsmUtils;
 import org.objectweb.asm.*;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class EntityAsmFactory implements Opcodes {
 
 			ClassReader reader;
 			try {
-				reader = new ClassReader(clazz.getName());
+				reader = new ClassReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".class"));
 			} catch (IOException ioexception) {
 				throw new RuntimeException(ioexception);
 			}
@@ -115,7 +115,7 @@ public class EntityAsmFactory implements Opcodes {
 		ClassReader reader;
 		String enhancedClassName = clazz.getName() + SUFIX;
 		try {
-			reader = new ClassReader(clazz.getName());
+			reader = new ClassReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".class"));
 		} catch (IOException ioexception) {
 			throw new EnhanceAccessError("无法获取类信息:" + clazz.getName(), ioexception);
 		}

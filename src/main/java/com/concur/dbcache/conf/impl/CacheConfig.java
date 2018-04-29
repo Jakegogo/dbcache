@@ -12,8 +12,8 @@ import com.concur.dbcache.EntityLoadListener;
 import com.concur.dbcache.anno.DynamicUpdate;
 import com.concur.dbcache.conf.CacheType;
 import com.concur.dbcache.pkey.IdGenerator;
-import com.concur.unity.JsonUtils;
-import com.concur.unity.enhance.asm.ValueGetter;
+import com.concur.unity.utils.JsonUtils;
+import com.concur.unity.asm.ValueGetter;
 import com.concur.unity.reflect.AnnotationUtils;
 
 import java.util.*;

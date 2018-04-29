@@ -2,8 +2,8 @@ package com.concur.dbcache.support.asm;
 
 import com.concur.dbcache.anno.ChangeFields;
 import com.concur.dbcache.utils.MutableInteger;
-import com.concur.unity.enhance.asm.AsmAccessHelper;
-import com.concur.unity.enhance.asm.util.AsmUtils;
+import com.concur.unity.asm.AsmAccessHelper;
+import com.concur.unity.asm.util.AsmUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;

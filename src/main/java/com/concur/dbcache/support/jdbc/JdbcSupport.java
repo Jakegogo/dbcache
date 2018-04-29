@@ -4,11 +4,9 @@ import com.concur.dbcache.anno.Shard;
 import com.concur.dbcache.conf.ShardStrategy;
 import com.concur.dbcache.pkey.IdGenerator;
 import com.concur.dbcache.utils.MutableInteger;
-import com.concur.unity.StringUtils;
+import com.concur.unity.utils.StringUtils;
+import com.concur.unity.asm.util.AsmUtils;
 import com.concur.unity.collections.concurrent.IdentityHashMap;
-import com.concur.unity.enhance.asm.util.AsmUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
@@ -19,7 +17,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.*;
 import java.util.*;
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 /**

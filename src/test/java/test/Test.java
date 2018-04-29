@@ -10,7 +10,7 @@ import com.concur.dbcache.conf.DbRuleService;
 import com.concur.dbcache.support.jdbc.JdbcSupport;
 import com.concur.dbcache.utils.CacheUtils;
 import com.concur.dbcache.utils.JdbcUtil;
-import com.concur.unity.JsonUtils;
+import com.concur.unity.utils.JsonUtils;
 import com.concur.unity.collections.concurrent.ConcurrentHashSet;
 import com.concur.unity.collections.concurrent.ConcurrentWeakHashMap;
 import com.concur.unity.thread.ThreadUtils;

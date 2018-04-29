@@ -2,9 +2,9 @@ package com.concur.dbcache.support.jdbc;
 
 import com.alibaba.fastjson.JSON;
 import com.concur.dbcache.anno.JsonType;
-import com.concur.unity.enhance.asm.AsmAccessHelper;
-import com.concur.unity.enhance.asm.ValueGetter;
-import com.concur.unity.enhance.asm.ValueSetter;
+import com.concur.unity.asm.AsmAccessHelper;
+import com.concur.unity.asm.ValueGetter;
+import com.concur.unity.asm.ValueSetter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

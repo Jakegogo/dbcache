@@ -9,7 +9,7 @@ import com.concur.dbcache.CacheObject;
 import com.concur.dbcache.IEntity;
 import com.concur.dbcache.dbaccess.DbAccessService;
 import com.concur.dbcache.persist.service.DbBatchAccessService;
-import com.concur.unity.JsonUtils;
+import com.concur.unity.utils.JsonUtils;
 import com.concur.unity.thread.NamedThreadFactory;
 import com.concur.unity.thread.ThreadUtils;
 import org.apache.commons.lang.StringUtils;

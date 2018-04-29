@@ -11,7 +11,7 @@ import com.concur.dbcache.conf.Inject;
 import com.concur.dbcache.conf.impl.CacheConfig;
 import com.concur.dbcache.dbaccess.DbAccessService;
 import com.concur.unity.collections.concurrent.ConcurrentHashMapV8;
-import com.concur.unity.enhance.asm.ValueGetter;
+import com.concur.unity.asm.ValueGetter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
