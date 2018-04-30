@@ -8,6 +8,7 @@ import com.concur.dbcache.persist.service.DbPersistService;
 import com.concur.dbcache.CacheObject;
 import com.concur.dbcache.IEntity;
 import com.concur.dbcache.dbaccess.DbAccessService;
+import com.concur.unity.thread.NamedThreadPoolExecutor;
 import com.concur.unity.utils.JsonUtils;
 import com.concur.unity.thread.NamedThreadFactory;
 import com.concur.unity.thread.ThreadUtils;
@@ -18,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 
 /**
@@ -59,7 +58,10 @@ public class DelayDbPersistService implements DbPersistService {
 		// 初始化入库线程
 		ThreadGroup threadGroup = new ThreadGroup("缓存模块");
 		NamedThreadFactory threadFactory = new NamedThreadFactory(threadGroup, "延时入库线程池");
-		DB_POOL_SERVICE = Executors.newSingleThreadExecutor(threadFactory);
+		DB_POOL_SERVICE = new NamedThreadPoolExecutor(1, 1,
+				0L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>(),
+				threadFactory);
 		// 初始化入库线程
 		DB_POOL_SERVICE.submit(new Runnable() {
 			@Override

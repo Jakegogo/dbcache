@@ -8,6 +8,7 @@ import com.concur.dbcache.persist.service.DbPersistService;
 import com.concur.dbcache.CacheObject;
 import com.concur.dbcache.IEntity;
 import com.concur.dbcache.dbaccess.DbAccessService;
+import com.concur.unity.thread.NamedThreadPoolExecutor;
 import com.concur.unity.utils.JsonUtils;
 import com.concur.unity.thread.NamedThreadFactory;
 import com.concur.unity.thread.ThreadUtils;
@@ -81,7 +82,7 @@ public class InTimeDbPersistService implements DbPersistService {
 		}
 
 		// 初始化线程池
-		DB_POOL_SERVICE = new ThreadPoolExecutor(dbPoolSize, dbPoolSize,
+		DB_POOL_SERVICE = new NamedThreadPoolExecutor(dbPoolSize, dbPoolSize,
 				0L, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<Runnable>(EXECUTOR_QUEUE_SIZE),
 				threadFactory);
