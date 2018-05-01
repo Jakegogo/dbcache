@@ -224,16 +224,25 @@ public class DelayDbPersistService implements DbPersistService, ApplicationListe
 					//获取下一个有效的元素
 					updateAction = updateQueue.poll();
 				} while (true);
-
+			} catch (InterruptedException e) {
+				// 记录日志
+				if (updateAction != null && updateAction.persistAction != null) {
+					logger.error(
+							"延时入库被中断! 如果是主键冲突异常可忽略!"
+									+ updateAction.persistAction.getPersistInfo(), e);
+				} else {
+					logger.error("延时入库被中断! 如果是主键冲突异常可忽略!", e);
+				}
+				throw new RuntimeException(e);
 			} catch (Exception e) {
 				e.printStackTrace();
 				// 记录日志
 				if (updateAction != null && updateAction.persistAction != null) {
 					logger.error(
-							"执行入库时产生异常! 如果是主键冲突异常可忽略!"
+							"延时入库时产生异常! 如果是主键冲突异常可忽略!"
 									+ updateAction.persistAction.getPersistInfo(), e);
 				} else {
-					logger.error("执行批量入库时产生异常! 如果是主键冲突异常可忽略!", e);
+					logger.error("延时入库时产生异常! 如果是主键冲突异常可忽略!", e);
 				}
 
 				//等待下一个检测时间重试入库

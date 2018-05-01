@@ -66,7 +66,7 @@ public class ConcurrentWeekHashMapCache implements CacheUnit {
 
 	static {
 
-		Thread thread = new Thread("垃圾回收引用监视器") {
+		Thread thread = new Thread("ConcurrentWeekHashMapCache回收引用监视器") {
 
 			@SuppressWarnings("rawtypes")
 			@Override
@@ -89,7 +89,8 @@ public class ConcurrentWeekHashMapCache implements CacheUnit {
 							throw e;
 						}
 					}
-
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

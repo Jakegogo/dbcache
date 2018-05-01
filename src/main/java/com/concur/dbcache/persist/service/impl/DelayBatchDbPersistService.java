@@ -350,17 +350,26 @@ public class DelayBatchDbPersistService implements DbPersistService, Application
 					}
 					
 				} while (!Thread.currentThread().isInterrupted());
-
+			} catch (InterruptedException e){
+				// 输出日志
+				if (persistAction != null) {
+					logger.error(
+							"批量延迟入库执行入库时被中断! 如果是主键冲突异常可忽略!"
+									+ persistAction.getPersistInfo(), e);
+				} else {
+					logger.error("批量延迟入库执行入库时被中断! 如果是主键冲突异常可忽略!", e);
+				}
+				throw new RuntimeException(e);
 			} catch (Exception e) {
 				e.printStackTrace();
 
 				// 输出日志
 				if (persistAction != null) {
 					logger.error(
-							"执行入库时产生异常! 如果是主键冲突异常可忽略!"
+							"批量延迟入库时产生异常! 如果是主键冲突异常可忽略!"
 									+ persistAction.getPersistInfo(), e);
 				} else {
-					logger.error("执行批量入库时产生异常! 如果是主键冲突异常可忽略!", e);
+					logger.error("批量延迟入库时产生异常! 如果是主键冲突异常可忽略!", e);
 				}
 				
 				//等待下一个检测时间重试入库
