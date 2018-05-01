@@ -295,7 +295,7 @@ public class DelayBatchDbPersistService implements DbPersistService, Application
 		PersistAction persistAction = processQueue.poll();
 		
 		//循环定时检测入库,失败自动进入重试
-		while (!Thread.interrupted()) {
+		while (!Thread.currentThread().isInterrupted()) {
 			
 			try {
 				
@@ -326,7 +326,7 @@ public class DelayBatchDbPersistService implements DbPersistService, Application
 							if (persistAction != null && persistAction.valid()) {
 								persistAction.run();
 							}
-							if (Thread.interrupted()) {
+							if (Thread.currentThread().isInterrupted()) {
 								break;
 							}
 						} while ((persistAction = processQueue.poll()) != null); // 获取下一个有效的操作元素
@@ -345,7 +345,7 @@ public class DelayBatchDbPersistService implements DbPersistService, Application
 						} catch (InterruptedException e) {}
 					}
 					
-				} while (!Thread.interrupted());
+				} while (!Thread.currentThread().isInterrupted());
 
 			} catch (Exception e) {
 				e.printStackTrace();

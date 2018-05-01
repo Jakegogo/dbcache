@@ -75,7 +75,7 @@ public class ConcurrentWeekHashMapCache implements CacheUnit {
 				try {
 
 					long waitTimmer = TimeUnit.SECONDS.toMillis(1);
-					while (!Thread.interrupted()) {
+					while (!Thread.currentThread().isInterrupted()) {
 						try {
 							for (FinalizableReferenceQueue referenceQueue1 : referenceQueues) {
 								referenceQueue1.cleanUp(waitTimmer);

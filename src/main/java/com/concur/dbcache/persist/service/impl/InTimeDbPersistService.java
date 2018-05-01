@@ -215,12 +215,12 @@ public class InTimeDbPersistService implements DbPersistService {
 		// 定时检测失败操作
 		final long delayWaitTimmer = dbRuleService.getDelayWaitTimmer();//延迟入库时间(毫秒)
 		PersistAction action = null;
-		while (!Thread.interrupted()) {
+		while (!Thread.currentThread().isInterrupted()) {
 			try {
 				action = retryQueue.poll();
 				while (action != null) {
 					handlePersist(action);
-					if (Thread.interrupted()) {
+					if (Thread.currentThread().isInterrupted()) {
 						break;
 					}
 					action = retryQueue.poll();

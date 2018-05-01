@@ -192,7 +192,7 @@ public class DelayDbPersistService implements DbPersistService, ApplicationListe
 		//循环定时检测入库,失败自动进入重试
 		QueuedAction updateAction = updateQueue.poll();
 
-		while (!Thread.interrupted()) {
+		while (!Thread.currentThread().isInterrupted()) {
 			try {
 				long timeDiff;
 				do {
@@ -214,7 +214,7 @@ public class DelayDbPersistService implements DbPersistService, ApplicationListe
 						updateAction.doRunTask();
 					}
 
-					if (Thread.interrupted()) {
+					if (Thread.currentThread().isInterrupted()) {
 						break;
 					}
 					//获取下一个有效的元素
