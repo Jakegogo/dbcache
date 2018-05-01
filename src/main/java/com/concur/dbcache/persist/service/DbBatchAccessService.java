@@ -30,6 +30,7 @@ public interface DbBatchAccessService extends DbAccessService {
 	 * @param entity 实体
 	 * @param modifiedFields 修改过的属性集合(线程安全)
 	 */
+	@Override
 	<T> void update(T entity, AtomicIntegerArray modifiedFields);
 	
 	/**

@@ -305,7 +305,10 @@ public class DelayBatchDbPersistService implements DbPersistService {
 						// 执行批量入库任务
 						flushBatchTask();
 						// 等待下一个检测时间
-						Thread.sleep(delayCheckTimmer);
+						try {
+							Thread.sleep(delayCheckTimmer);
+						} catch (InterruptedException e){}
+
 					}
 
 
@@ -335,7 +338,9 @@ public class DelayBatchDbPersistService implements DbPersistService {
 						lastFlush = System.currentTimeMillis();
 					} else {
 						// 等待
-						Thread.sleep(timeDiff);
+						try {
+							Thread.sleep(timeDiff);
+						} catch (InterruptedException e) {}
 					}
 					
 				} while (!Thread.interrupted());
