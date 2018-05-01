@@ -16,6 +16,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -29,7 +31,7 @@ import java.util.concurrent.*;
  * @date 2014年8月13日上午12:31:06
  */
 @Component("delayDbPersistService")
-public class DelayDbPersistService implements DbPersistService {
+public class DelayDbPersistService implements DbPersistService, ApplicationListener<ContextClosedEvent> {
 
 	/**
 	 * logger
@@ -243,7 +245,7 @@ public class DelayDbPersistService implements DbPersistService {
 	@Override
 	public void destroy() {
 		// 关闭消费入库线程池
-		ThreadUtils.shundownThreadPool(DB_POOL_SERVICE, true);
+		ThreadUtils.shundownThreadPool(DB_POOL_SERVICE, false);
 		int failCount = 0;
 		while (failCount < 3) {
 			try {
@@ -297,6 +299,11 @@ public class DelayDbPersistService implements DbPersistService {
 	@Override
 	public ExecutorService getThreadPool() {
 		return DB_POOL_SERVICE;
+	}
+
+	@Override
+	public void onApplicationEvent(ContextClosedEvent event) {
+		destroy();
 	}
 
 

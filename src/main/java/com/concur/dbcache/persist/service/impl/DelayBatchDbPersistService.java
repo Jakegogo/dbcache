@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -33,7 +35,7 @@ import java.util.concurrent.*;
  * @date 2014年8月13日上午12:31:06
  */
 @Component("delayBatchDbPersistService")
-public class DelayBatchDbPersistService implements DbPersistService {
+public class DelayBatchDbPersistService implements DbPersistService, ApplicationListener<ContextClosedEvent> {
 	
 	/**
 	 * logger
@@ -138,7 +140,7 @@ public class DelayBatchDbPersistService implements DbPersistService {
 	public void init() {
 		// 初始化入库线程
 		ThreadGroup threadGroup = new ThreadGroup("缓存模块");
-		NamedThreadFactory threadFactory = new NamedThreadFactory(threadGroup, "延时入库线程池");
+		NamedThreadFactory threadFactory = new NamedThreadFactory(threadGroup, "批量延时入库线程池");
 		DB_POOL_SERVICE = new NamedThreadPoolExecutor(1, 1,
 				0L, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<Runnable>(),
@@ -369,7 +371,7 @@ public class DelayBatchDbPersistService implements DbPersistService {
 	@Override
 	public void destroy() {
 		// 关闭消费入库线程池
-		ThreadUtils.shundownThreadPool(DB_POOL_SERVICE, true);
+		ThreadUtils.shundownThreadPool(DB_POOL_SERVICE, false);
 				
 		int failCount = 0;
 		while (failCount < 3) {
@@ -436,6 +438,11 @@ public class DelayBatchDbPersistService implements DbPersistService {
 	@Override
 	public ExecutorService getThreadPool() {
 		return DB_POOL_SERVICE;
+	}
+
+	@Override
+	public void onApplicationEvent(ContextClosedEvent event) {
+		destroy();
 	}
 
 

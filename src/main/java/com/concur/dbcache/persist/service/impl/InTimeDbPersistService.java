@@ -89,10 +89,12 @@ public class InTimeDbPersistService implements DbPersistService {
 		
 		// 初始化检测线程
 		checkRetryThread = new Thread() {
+			@Override
 			public void run() {
 				processRetry();
 			}
 		};
+		checkRetryThread.setName("dbcache即时入库重试线程");
 		checkRetryThread.start();
 	}
 
