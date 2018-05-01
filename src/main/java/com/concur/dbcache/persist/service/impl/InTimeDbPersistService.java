@@ -236,7 +236,7 @@ public class InTimeDbPersistService implements DbPersistService {
 			try {
 				Thread.sleep(delayWaitTimmer);
 			} catch (InterruptedException e1) {
-				// ignore
+				throw new RuntimeException(e1);
 			}
 		}
 	}

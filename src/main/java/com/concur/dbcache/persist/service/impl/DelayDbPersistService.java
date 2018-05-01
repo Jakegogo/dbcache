@@ -239,7 +239,9 @@ public class DelayDbPersistService implements DbPersistService, ApplicationListe
 				//等待下一个检测时间重试入库
 				try {
 					Thread.sleep(delayCheckTimmer);
-				} catch (InterruptedException e1) {}
+				} catch (InterruptedException e1) {
+					throw new RuntimeException(e1);
+				}
 
 			}
 		}
@@ -260,7 +262,9 @@ public class DelayDbPersistService implements DbPersistService, ApplicationListe
 				e.printStackTrace();
 				try {
 					Thread.sleep(3000);
-				} catch (InterruptedException e1) {}
+				} catch (InterruptedException e1) {
+					throw new RuntimeException(e1);
+				}
 				failCount ++;
 			}
 		}
