@@ -309,7 +309,9 @@ public class DelayBatchDbPersistService implements DbPersistService, Application
 						// 等待下一个检测时间
 						try {
 							Thread.sleep(delayCheckTimmer);
-						} catch (InterruptedException e){}
+						} catch (InterruptedException e){
+							throw e;
+						}
 
 					}
 
@@ -342,7 +344,9 @@ public class DelayBatchDbPersistService implements DbPersistService, Application
 						// 等待
 						try {
 							Thread.sleep(timeDiff);
-						} catch (InterruptedException e) {}
+						} catch (InterruptedException e) {
+							throw e;
+						}
 					}
 					
 				} while (!Thread.currentThread().isInterrupted());

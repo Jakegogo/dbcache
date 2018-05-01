@@ -86,7 +86,7 @@ public class ConcurrentWeekHashMapCache implements CacheUnit {
 						try {
 							Thread.sleep(waitTimmer);
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+							throw e;
 						}
 					}
 

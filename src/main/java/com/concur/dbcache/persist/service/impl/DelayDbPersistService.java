@@ -199,7 +199,9 @@ public class DelayDbPersistService implements DbPersistService, ApplicationListe
 					if (updateAction == null) {
 						try {
 							Thread.sleep(delayCheckTimmer);//等待下一个检测时间
-						} catch (InterruptedException e) {}
+						} catch (InterruptedException e) {
+							throw e;
+						}
 					} else if (updateAction.persistAction.valid()) {
 						timeDiff = System.currentTimeMillis() - updateAction.createTime;
 						//未到延迟入库时间
@@ -208,7 +210,9 @@ public class DelayDbPersistService implements DbPersistService, ApplicationListe
 							try {
 								//等待
 								Thread.sleep(delayWaitTimmer - timeDiff);
-							} catch (InterruptedException e) {}
+							} catch (InterruptedException e) {
+								throw e;
+							}
 						}
 						//执行入库
 						updateAction.doRunTask();
