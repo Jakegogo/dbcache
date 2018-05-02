@@ -84,13 +84,6 @@ public class DbConfigFactoryImpl implements DbConfigFactory, DbCacheMBean {
 	@Qualifier("inTimeDbPersistService")
 	private DbPersistService intimeDbPersistService;
 
-	/**
-	 * 延迟持久化服务
-	 */
-	@Autowired
-	@Qualifier("delayDbPersistService")
-	private DbPersistService delayDbPersistService;
-
 
 	/**
 	 * DbCacheService实例映射
@@ -306,6 +299,7 @@ public class DbConfigFactoryImpl implements DbConfigFactory, DbCacheMBean {
 
 		// 解析注解
 		ReflectionUtils.doWithFields(clz, new FieldCallback() {
+			@Override
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 				// 忽略静态属性和临时属性
 				if (Modifier.isTransient(field.getModifiers())
@@ -531,9 +525,6 @@ public class DbConfigFactoryImpl implements DbConfigFactory, DbCacheMBean {
 		infoMap.put("intimeDbPersistService", ThreadUtils.dumpThreadPool(
 				"intimeDbPersistServiceTheadPool",
 				this.intimeDbPersistService.getThreadPool()));
-		infoMap.put("delayDbPersistService", ThreadUtils.dumpThreadPool(
-				"delayDbPersistServiceTheadPool",
-				this.delayDbPersistService.getThreadPool()));
 		return infoMap;
 	}
 

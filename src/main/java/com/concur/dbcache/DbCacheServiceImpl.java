@@ -454,10 +454,12 @@ public class DbCacheServiceImpl<T extends IEntity<PK>, PK extends Comparable<PK>
 	public String toString() {
 		Map<String, Object> toStrMap = new HashMap<String, Object>();
 		toStrMap.put("clazz", this.clazz);
-		toStrMap.put("proxyClazz", this.cacheConfig.getProxyClazz());
+		toStrMap.put("proxyClazz", this.cacheConfig != null ? this.cacheConfig.getProxyClazz():null);
 		toStrMap.put("WAITING_LOCK_MAP_SIZE", this.WAITING_LOCK_MAP.size());
-		toStrMap.put("cacheUseSize", this.cacheUnit.getCachedSize());
-		toStrMap.put("indexServiceCacheUseSize", this.indexService.getCacheUnit().getCachedSize());
+		toStrMap.put("cacheUseSize", this.cacheUnit != null ? this.cacheUnit.getCachedSize():0);
+		toStrMap.put("indexServiceCacheUseSize",
+				(this.indexService != null && this.indexService.getCacheUnit() != null ) ?
+						this.indexService.getCacheUnit().getCachedSize():0);
 		return JsonUtils.object2JsonString(toStrMap);
 	}
 

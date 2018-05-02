@@ -1,5 +1,6 @@
 package com.concur.dbcache.persist.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.concur.dbcache.cache.CacheUnit;
 import com.concur.dbcache.conf.DbRuleService;
 import com.concur.dbcache.conf.impl.CacheConfig;
@@ -9,6 +10,8 @@ import com.concur.dbcache.CacheObject;
 import com.concur.dbcache.IEntity;
 import com.concur.dbcache.dbaccess.DbAccessService;
 import com.concur.unity.thread.NamedThreadPoolExecutor;
+import com.concur.unity.typesafe.SafeActor;
+import com.concur.unity.utils.DateUtils;
 import com.concur.unity.utils.JsonUtils;
 import com.concur.unity.thread.NamedThreadFactory;
 import com.concur.unity.thread.ThreadUtils;
@@ -20,7 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 即时入库实现
@@ -39,6 +46,16 @@ public class InTimeDbPersistService implements DbPersistService {
 	 * logger
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(InTimeDbPersistService.class);
+
+	/**
+	 * WAL logger
+	 */
+	private static final Logger walLogger = LoggerFactory.getLogger("WAL-LOGGER");
+
+	/**
+	 * WCL logger
+	 */
+	private static final Logger wclLogger = LoggerFactory.getLogger("WCL-LOGGER");
 
 	/**
 	 * 缺省入库线程池容量
@@ -119,6 +136,7 @@ public class InTimeDbPersistService implements DbPersistService {
 				dbAccessService.save(entity);
 				// 设置状态为持久化
 				cacheObject.setPersistStatus(PersistStatus.PERSIST);
+				super.run();
 			}
 			
 			@Override
@@ -158,11 +176,13 @@ public class InTimeDbPersistService implements DbPersistService {
 				} else {
 					dbAccessService.update(cacheObject.getEntity());
 				}
+				super.run();
 			}
 
 			@Override
 			public void onException(Throwable t) {
 				retryQueue.add(this);
+				t.printStackTrace();
 			}
 
 			@Override
@@ -190,6 +210,7 @@ public class InTimeDbPersistService implements DbPersistService {
 				}
 				// 持久化
 				dbAccessService.delete(cacheObject.getEntity());
+				super.run();
 			}
 			
 			@Override
@@ -246,8 +267,12 @@ public class InTimeDbPersistService implements DbPersistService {
 	public void destroy() {
 		// 中断重试线程
 		checkRetryThread.interrupt();
-		
-		// 清空重试队列
+
+		int retryQueueSize = retryQueue.size();
+		if (retryQueueSize > 0) {
+			logger.error("正在执行重试队列任务, 数量:{}", retryQueueSize);
+		}
+		// 消费重试队列
 		PersistAction action = retryQueue.poll();
 		while (action != null) {
 			handlePersist(action);
@@ -255,7 +280,18 @@ public class InTimeDbPersistService implements DbPersistService {
 		}
 
 		// 关闭消费入库线程池
-		ThreadUtils.shundownThreadPool(DB_POOL_SERVICE, false);
+		Queue<Runnable> queue = ThreadUtils.shundownThreadPool(DB_POOL_SERVICE, 3600);
+		if (queue != null) {
+			// 消费未完成的任务
+			Runnable runnable;
+			while ((runnable = queue.poll()) != null) {
+				try {
+					runnable.run();
+				} catch (Exception e) {
+					logger.error("消费未完成的任务异常", e);
+				}
+			}
+		}
 	}
 
 
@@ -279,7 +315,8 @@ public class InTimeDbPersistService implements DbPersistService {
 	 * 提交持久化任务
 	 * @param persistAction
 	 */
-	private void handlePersist(final FinalCommitActor persistAction) {
+	private void handlePersist(final PersistAction persistAction) {
+		// 执行异步入库动作
 		try {
 			persistAction.start(DB_POOL_SERVICE);
 		} catch (RejectedExecutionException ex) {
@@ -289,6 +326,8 @@ public class InTimeDbPersistService implements DbPersistService {
 			persistAction.onException(ex);
 			logger.error("提交任务到更新队列产生异常", ex);
 		}
+		// 执行WAL动作
+		new WriteAheadLogAction(persistAction.getCacheObject(), persistAction.getTxId()).start();
 	}
 
 	/**
@@ -300,12 +339,152 @@ public class InTimeDbPersistService implements DbPersistService {
 	}
 
 
-	static abstract class PersistAction extends FinalCommitActor {
-		public PersistAction(SafeType safeType) {
-			super(safeType);
+	/**
+	 * 持久化动作
+	 */
+	static abstract class PersistAction<T extends IEntity<?>> extends FinalCommitActor {
+		final CacheObject<T> cacheObject;
+
+		final static AtomicLong txIdGen = new AtomicLong(0);
+		final long txId;
+
+		public PersistAction(CacheObject<T> cacheObject) {
+			super(cacheObject);
+			this.cacheObject = cacheObject;
+			this.txId = genTxId();
 		}
+
+		private long genTxId() {
+			long num = txIdGen.incrementAndGet();
+			if (num >= Long.MAX_VALUE - 10) {
+				txIdGen.compareAndSet(num, 1);
+				return txIdGen.incrementAndGet();
+			}
+			return num;
+		}
+
 		public abstract String getPersistInfo();
+
+		public CacheObject<?> getCacheObject() {
+			return cacheObject;
+		}
+
+		public long getTxId() {
+			return txId;
+		}
+
+		/**
+		 * 此方法我异步执行
+		 */
+		@Override
+		public void run() {
+			// WAL取消写入操作. 当log写入线程繁忙时, 可以适当减少WAL的写入来减少延迟
+			new WriteEmptyAheadLogAction(cacheObject, txId).start();
+			// WCL写入操作
+			List<Long> skippedtxIds = new ArrayList<Long>();
+			for (Runnable runnable : this.getSkipped()) {
+				skippedtxIds.add(((PersistAction) runnable).getTxId());
+			}
+			new WriteCommitLogAction(cacheObject, txId, skippedtxIds).start();
+//			logger.error("put empty wal txId={}, {}", txId, cacheObject.getEntity().getId());
+		}
+
+
+		@Override
+		public void skip() {
+//			walLogger.error("skip " + this.hashCode());
+		}
 	}
 
+	/**
+	 * WAL动作
+	 */
+	static class WriteAheadLogAction extends FinalCommitActor {
+		final CacheObject<?> cacheObject;
+		final long txId;
+		volatile boolean run = false;
+		public WriteAheadLogAction(CacheObject<?> cacheObject, long txId) {
+			super(cacheObject.getWalLog());
+			this.cacheObject = cacheObject;
+			this.txId = txId;
+		}
+
+		public CacheObject<?> getCacheObject() {
+			return cacheObject;
+		}
+
+		@Override
+		public void run() {
+			// TODO 写入日志
+			Object entity = cacheObject.getEntity();
+			walLogger.error("{}|{}|{}|{}", txId, DateUtils.currentTimeStr(), entity.getClass().getName(), JsonUtils.object2JsonString(entity));
+//			logger.error("log wal txId={}, {}", txId, cacheObject.getEntity().getId());
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+		}
+
+		@Override
+		public void skip() {
+//			skip it
+//			walLogger.error("skip {}-{}-{}", txId, DateUtils.currentTimeStr(), JsonUtils.object2JsonString(cacheObject.getEntity()));
+		}
+	}
+
+
+	/**
+	 * WAL取消写入操作
+	 * 因为线程池异步执行的速度够快, 已经把任务执行完成了, 所以不需要写入日志
+	 */
+	static class WriteEmptyAheadLogAction extends FinalCommitActor {
+		final CacheObject<?> cacheObject;
+		final long txId;
+		public WriteEmptyAheadLogAction(CacheObject<?> cacheObject, long txId) {
+			super(cacheObject.getWalLog());
+			this.cacheObject = cacheObject;
+			this.txId = txId;
+		}
+
+		public CacheObject<?> getCacheObject() {
+			return cacheObject;
+		}
+
+		@Override
+		public void run() {
+			// do nothing
+			logger.error("log empty wal txId={}, {}", txId, cacheObject.getEntity().getId());
+		}
+	}
+
+
+	/**
+	 * WCL动作
+	 */
+	static class WriteCommitLogAction extends SafeActor {
+		final long txId;
+		final List<Long> skippedtxIds;
+		public WriteCommitLogAction(CacheObject<?> cacheObject, long txId, List<Long> skippedtxIds) {
+			super(cacheObject.getWclLog());
+			this.txId = txId;
+			this.skippedtxIds = skippedtxIds;
+		}
+
+		@Override
+		public void run() {
+			// TODO 写入日志
+			for (Long txId : skippedtxIds) {
+				wclLogger.error("{}|{}", txId, DateUtils.currentTimeStr());
+			}
+			wclLogger.error("{}|{}", txId, DateUtils.currentTimeStr());
+//			logger.error("log wcl txId={}, {}", txId, cacheObject.getEntity().getId());
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+		}
+	}
 
 }

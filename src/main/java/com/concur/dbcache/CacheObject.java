@@ -31,7 +31,7 @@ public class CacheObject<T extends IEntity<?>> extends SafeType {
 	/**
 	 * 修改过的属性
 	 */
-	private AtomicIntegerArray modifiedFields;
+	private volatile AtomicIntegerArray modifiedFields;
 
 
 	// for persist
@@ -44,6 +44,16 @@ public class CacheObject<T extends IEntity<?>> extends SafeType {
 	 * 索引对象引用持有
 	 */
 	private final Set<IndexObject<?>> indexObjects = new TreeSet<IndexObject<?>>();
+
+	/**
+	 * WAL日志
+	 */
+	private volatile WALLog walLog = new WALLog();
+
+	/**
+	 * WCL日志
+	 */
+	private volatile WCLLog wclLog = new WCLLog();
 
 	/**
 	 * 构造方法
@@ -156,4 +166,11 @@ public class CacheObject<T extends IEntity<?>> extends SafeType {
 		this.indexObjects.add(indexObject);
 	}
 
+	public WALLog getWalLog() {
+		return walLog;
+	}
+
+	public WCLLog getWclLog() {
+		return wclLog;
+	}
 }

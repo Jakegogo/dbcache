@@ -1,7 +1,5 @@
 package com.concur.dbcache.conf;
 
-import com.concur.dbcache.persist.service.impl.DelayBatchDbPersistService;
-import com.concur.dbcache.persist.service.impl.DelayDbPersistService;
 import com.concur.dbcache.persist.service.impl.InTimeDbPersistService;
 
 /**
@@ -16,20 +14,7 @@ public enum PersistType {
 	 */
 	INTIME(InTimeDbPersistService.class),
 
-
-	/**
-	 * 延时入库
-	 */
-	DELAY(DelayDbPersistService.class, "delayDbPersistService"),
-	
-	
-	/**
-	 * 延时批量入库
-	 * <br/>此方式不支持DynamicUpdate
-	 * <br/>不能支持到Hibernate入库方式
-	 */
-	DELAY_BATCH(DelayBatchDbPersistService.class, "delayBatchDbPersistService");
-
+;
 
 	/** 持久化类 */
 	private final Class<?> dbPersistServiceClass;

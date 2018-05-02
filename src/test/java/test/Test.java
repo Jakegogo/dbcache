@@ -150,6 +150,42 @@ public class Test {
 	}
 
 
+	/**
+	 * 测试用WAL
+	 */
+	@org.junit.Test
+	public void testSimpleUpdate() throws InterruptedException {
+
+		for (int i = 0; i< 5;i++) {
+
+			new Thread(){
+				@Override
+				public void run() {
+					for (long j = 0; j < 200000; j++) {
+						Entity entity = dbService.get(Entity.class, 101L);
+
+						dbService.submitUpdate(entity);
+
+					}
+				}
+			}.start();
+
+		}
+
+
+		while(true) {
+			try {
+				System.out.println(ThreadUtils.dumpThreadPool("入库线程池", this.cacheService.getThreadPool()));
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+
 
 	/**
 	 * 测试用例

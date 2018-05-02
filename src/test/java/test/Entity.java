@@ -49,12 +49,12 @@ public class Entity implements EntityInitializer, IEntity<Long> {
 
 //	@UpdateIndex({ "num_idx" })
 //	@ChangeFields({"num"})
-	public void increseNum() {
-		this.uid = this.idgenerator.incrementAndGet();
+	public int increseNum() {
+		return this.uid = this.idgenerator.incrementAndGet();
 	}
 
-	public void addNum() {
-		this.increseNum();
+	public int addNum() {
+		return this.increseNum();
 	}
 
 	public int getNum() {
@@ -151,13 +151,13 @@ public class Entity implements EntityInitializer, IEntity<Long> {
 		return this.id.equals(target.id);
 	}
 
-	public static void main(String[] args) {
-
-		for(Method method : Entity.class.getDeclaredMethods() ) {
-			System.out.println(method);
-		}
-
-	}
+//	public static void main(String[] args) {
+//
+//		for(Method method : Entity.class.getDeclaredMethods() ) {
+//			System.out.println(method);
+//		}
+//
+//	}
 
 	public String getName() {
 		return name;
