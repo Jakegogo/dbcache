@@ -61,7 +61,9 @@ public class EntityAsmFactory implements Opcodes {
 
 			ClassReader reader;
 			try {
-				reader = new ClassReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".class"));
+				reader = new ClassReader(Thread.currentThread()
+						.getContextClassLoader().getResourceAsStream(
+								clazz.getName().replace('.', '/') + ".class"));
 			} catch (IOException ioexception) {
 				throw new RuntimeException(ioexception);
 			}
@@ -115,7 +117,9 @@ public class EntityAsmFactory implements Opcodes {
 		ClassReader reader;
 		String enhancedClassName = clazz.getName() + SUFIX;
 		try {
-			reader = new ClassReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".class"));
+			reader = new ClassReader(Thread.currentThread()
+					.getContextClassLoader().getResourceAsStream(
+							clazz.getName().replace('.', '/') + ".class"));
 		} catch (IOException ioexception) {
 			throw new EnhanceAccessError("无法获取类信息:" + clazz.getName(), ioexception);
 		}
