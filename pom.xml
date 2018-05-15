@@ -95,7 +95,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.8.sec01</version>
+            <version>1.2.47</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
@@ -146,7 +146,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>lmodel</finalName>
+                    <finalName>dbcache</finalName>
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
