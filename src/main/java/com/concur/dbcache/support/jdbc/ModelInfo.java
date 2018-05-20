@@ -433,7 +433,7 @@ public class ModelInfo {
 			value = handleBlob(rs.getBlob(i));
 		else
 			value = rs.getObject(i);
-    	return ConvertUtils.convert(value, columnInfo.getType());
+    	return ConvertUtils.convert(value, columnInfo.getTargetType());
     }
 
     
