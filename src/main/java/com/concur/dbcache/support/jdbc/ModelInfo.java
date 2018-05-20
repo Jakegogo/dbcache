@@ -1,6 +1,7 @@
 package com.concur.dbcache.support.jdbc;
 
 import com.concur.dbcache.pkey.IdGenerator;
+import com.concur.unity.utils.ConvertUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -432,7 +433,7 @@ public class ModelInfo {
 			value = handleBlob(rs.getBlob(i));
 		else
 			value = rs.getObject(i);
-    	return value;
+    	return ConvertUtils.convert(value, columnInfo.getType());
     }
 
     

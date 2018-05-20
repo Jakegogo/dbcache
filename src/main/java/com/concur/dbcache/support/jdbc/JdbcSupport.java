@@ -3,6 +3,7 @@ package com.concur.dbcache.support.jdbc;
 import com.concur.dbcache.anno.Shard;
 import com.concur.dbcache.conf.ShardStrategy;
 import com.concur.dbcache.pkey.IdGenerator;
+import com.concur.dbcache.utils.FieldUtil;
 import com.concur.dbcache.utils.MutableInteger;
 import com.concur.unity.utils.StringUtils;
 import com.concur.unity.asm.util.AsmUtils;
@@ -815,6 +816,8 @@ public class JdbcSupport {
 					if (!StringUtils.isEmpty(columnAnno.name())) {
 						columnName = columnAnno.name();
 					}
+				} else {
+					columnName = FieldUtil.underscoreName(columnName);
 				}
 
 				// 主键
