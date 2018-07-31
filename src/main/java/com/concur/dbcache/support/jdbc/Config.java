@@ -101,7 +101,7 @@ public class Config {
 			this.dialect = dialect;
 		}
 		if (showSql != null) {
-			this.showSql = showSql;
+			Config.showSql = showSql;
 		}
 		if (devMode != null) {
 			this.devMode = devMode;

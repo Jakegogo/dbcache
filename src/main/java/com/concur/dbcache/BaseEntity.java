@@ -20,13 +20,15 @@ public abstract class BaseEntity<PK extends Comparable<PK> & Serializable> imple
 	 * Get id
 	 * @return id
 	 */
-    public abstract PK getId();
+    @Override
+	public abstract PK getId();
 
 
     /**
      * Set Id
      * @param id
      */
+	@Override
     public abstract void setId(PK id);
 
 
@@ -34,6 +36,7 @@ public abstract class BaseEntity<PK extends Comparable<PK> & Serializable> imple
      * Returns a multi-line String with key=value pairs.
      * @return a String representation of this class.
      */
+	@Override
     public String toString() {
     	return ReflectionToStringBuilder.toString(this);
     }
@@ -46,6 +49,7 @@ public abstract class BaseEntity<PK extends Comparable<PK> & Serializable> imple
      * @return true/false based on equality tests
      */
     @SuppressWarnings("rawtypes")
+	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
 			return true;
@@ -75,6 +79,7 @@ public abstract class BaseEntity<PK extends Comparable<PK> & Serializable> imple
      * http://www.hibernate.org/109.html
      * @return hashCode
      */
+	@Override
     public int hashCode() {
     	return 305668771 + 1793910479 * this.getId().hashCode();
     }

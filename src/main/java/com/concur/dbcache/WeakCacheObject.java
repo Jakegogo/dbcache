@@ -32,12 +32,14 @@ public class WeakCacheObject<T extends IEntity<?>, R extends WeakCacheEntity<T,?
 
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public T getEntity() {
 		return ((R) entity).get();
 	}
 
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public T getProxyEntity() {
 		return ((R) proxyEntity).get();
 	}

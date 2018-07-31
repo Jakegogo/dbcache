@@ -54,7 +54,7 @@ public class EntityAsmFactory implements Opcodes {
 		}
 
 
-		String enhancedClassName = clazz.getName() + SUFIX;
+		String enhancedClassName = clazz.getName() + SUFIX + "_" + System.currentTimeMillis();
 		try {
 			return (Class<T>) classLoader.loadClass(enhancedClassName);
 		} catch (ClassNotFoundException classNotFoundException) {
@@ -115,7 +115,7 @@ public class EntityAsmFactory implements Opcodes {
 
 
 		ClassReader reader;
-		String enhancedClassName = clazz.getName() + SUFIX;
+		String enhancedClassName = clazz.getName() + SUFIX + "_" + System.currentTimeMillis();
 		try {
 			reader = new ClassReader(Thread.currentThread()
 					.getContextClassLoader().getResourceAsStream(

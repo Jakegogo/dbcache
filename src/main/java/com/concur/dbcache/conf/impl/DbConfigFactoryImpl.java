@@ -493,8 +493,12 @@ public class DbConfigFactoryImpl implements DbConfigFactory, DbCacheMBean {
 
 	    final StandardMBean mbean = new StandardMBean(this, DbCacheMBean.class);
 
-	    // Register the Hello World MBean
-	    mbs.registerMBean(mbean, name);
+	    try {
+			// Register the Hello World MBean
+			mbs.registerMBean(mbean, name);
+		} catch (Exception e) {
+	    	logger.error("mbean注册未成功:", e);
+		}
 	}
 
 
